@@ -29,4 +29,7 @@ public class Admin {
     @JoinColumn(name = "user_credential_id")
     private UserCredential userCredential;
 
+    @OneToOne
+    @JoinColumn(name = "wallet_id")
+    private Wallet wallet;
 }

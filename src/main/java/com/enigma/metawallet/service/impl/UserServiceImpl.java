@@ -3,11 +3,18 @@ package com.enigma.metawallet.service.impl;
 import com.enigma.metawallet.entity.User;
 import com.enigma.metawallet.entity.UserCredential;
 import com.enigma.metawallet.model.request.UserRequest;
+import com.enigma.metawallet.model.request.WalletRequest;
 import com.enigma.metawallet.model.response.UserResponse;
+import com.enigma.metawallet.model.response.WalletResponse;
 import com.enigma.metawallet.repository.UserRepository;
 import com.enigma.metawallet.service.UserService;
+import com.enigma.metawallet.service.WalletService;
+import com.enigma.metawallet.util.ValidationUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -16,25 +23,28 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final ValidationUtil validationUtil;
 
     @Override
-    public UserResponse createNewUser(UserRequest request) {
+    public User createNewUser(User request) {
+        validationUtil.validate(request);
 
-        UserCredential userCredential = UserCredential.builder().build();
+        try {
+            User user = User.builder()
+                    .name(request.getName())
+                    .email(request.getEmail())
+                    .address(request.getAddress())
+                    .country(request.getCountry())
+                    .city(request.getCity())
+                    .mobilePhone(request.getMobilePhone())
+                    .build();
+            userRepository.save(user);
 
-        User user = User.builder()
-                .name(request.getName())
-                .email(request.getEmail())
-                .address(request.getAddress())
-                .country(request.getCountry())
-                .city(request.getCity())
-                .mobilePhone(request.getMobilePhone())
-                .userCredential(userCredential)
-                .build();
-        userRepository.save(user);
-        return UserResponse.builder()
-                .username(userCredential.getUsername())
-                .build();
+            return user;
+        }catch (DataIntegrityViolationException e){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "User already exist");
+        }
+
     }
 
     @Override

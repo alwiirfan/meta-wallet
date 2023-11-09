@@ -22,7 +22,10 @@ public class Wallet {
     @Column(nullable = false)
     private Long balance;
 
-    @OneToOne
-    @JoinColumn(name = "user_credential_id")
-    private UserCredential userCredential;
+    @OneToOne(mappedBy = "wallet")
+    private User user;
+
+    @OneToOne(mappedBy = "wallet")
+    private Admin admin;
+
 }

@@ -50,4 +50,8 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Transfer> transfers;
 
+    @OneToOne
+    @JoinColumn(name = "wallet_id")
+    private Wallet wallet;
+
 }

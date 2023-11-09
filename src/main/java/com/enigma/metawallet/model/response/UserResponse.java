@@ -16,5 +16,7 @@ public class UserResponse {
     private String username;
     private String address;
     private String mobilePhone;
+    private String country;
+    private String city;
     private WalletResponse wallet;
 }

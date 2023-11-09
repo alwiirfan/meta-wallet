@@ -31,8 +31,4 @@ public class Transfer {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToOne
-    @JoinColumn(name = "waalet_id")
-    private Wallet wallet;
-
 }

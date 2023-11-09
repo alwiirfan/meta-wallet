@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 public class UserRegisterResponse {
     private String email;
     private String username;
-    private WalletResponse wallet;
+    private UserResponse user;
 }

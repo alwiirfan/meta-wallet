@@ -36,13 +36,4 @@ public class UserCredential {
     )
     private List<Role> roles;
 
-    @OneToOne(mappedBy = "userCredential")
-    private Wallet wallet;
-
-    @OneToOne(mappedBy = "userCredential")
-    private User user;
-
-    @OneToOne(mappedBy = "userCredential")
-    private Admin admin;
-
 }

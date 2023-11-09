@@ -18,21 +18,15 @@ public class WalletServiceImpl implements WalletService {
     private final ValidationUtil validationUtil;
 
     @Override
-    public WalletResponse createNewWallet(WalletRequest request) {
+    public Wallet createNewWallet(Wallet request) {
         validationUtil.validate(request);
-
-        UserCredential userCredential = UserCredential.builder().build();
 
         Wallet wallet = Wallet.builder()
                 .balance(null)
-                .userCredential(userCredential)
                 .build();
         walletRepository.save(wallet);
 
-        return WalletResponse.builder()
-                .id(wallet.getId())
-                .balance(wallet.getBalance())
-                .build();
+        return wallet;
     }
 
     @Override

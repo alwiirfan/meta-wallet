@@ -6,6 +6,7 @@ import com.enigma.metawallet.entity.UserCredential;
 import com.enigma.metawallet.entity.roleContract.ERole;
 import com.enigma.metawallet.model.request.AuthRequest;
 import com.enigma.metawallet.model.request.UserRegisterRequest;
+import com.enigma.metawallet.model.request.WalletRequest;
 import com.enigma.metawallet.model.response.AdminRegisterResponse;
 import com.enigma.metawallet.model.response.LoginResponse;
 import com.enigma.metawallet.model.response.UserRegisterResponse;
@@ -24,6 +25,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -51,6 +54,13 @@ public class AuthServiceImpl implements AuthService {
                     .roles(List.of(role))
                     .build();
             userCredentialRepository.saveAndFlush(userCredential);
+
+            SimpleDateFormat dob = new SimpleDateFormat();
+
+//            User user = User.builder()
+//                    .dateOfBirth(new Date(dob.parse(request.get)))
+//                    .build();
+//            walletService.createNewWallet(walletRequest);
 
         }catch (DataIntegrityViolationException e){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "User already exist");
