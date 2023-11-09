@@ -21,7 +21,7 @@ public class AuthRequest {
     @Email(message = "Please enter a valid email!")
     private String email;
 
-    @Pattern(regexp = "^[a-zA-Z0-9]{10}")
+    @Pattern(regexp = "^[a-zA-Z0-9]{10}", message = "please you must enter 10 characters!")
     private String password;
 
 }

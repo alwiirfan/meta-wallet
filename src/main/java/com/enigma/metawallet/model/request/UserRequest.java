@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import java.util.Date;
 
 @Data
@@ -29,6 +30,8 @@ public class UserRequest {
     @NotBlank
     private String country;
 
+    @NotBlank
+    @Pattern(regexp = "^\\d{2}-\\d{2}-\\d{4}$", message = "please use format dd-MM-yyyy")
     private String dateOfBirth;
 
     @Email
