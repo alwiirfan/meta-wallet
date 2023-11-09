@@ -4,6 +4,8 @@ import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -22,14 +24,21 @@ public class User {
     @Column(length = 50)
     private String name;
 
+    @Temporal(TemporalType.DATE)
+    @Column(name = "date_of_birth")
+    private Date dateOfBirth;
+
     @Column(length = 50, nullable = false, unique = true)
     private String email;
 
     @Column(length = 100, nullable = false)
-    private String password;
-
-    @Column(length = 100, nullable = false)
     private String address;
+
+    @Column(length = 20, nullable = false)
+    private String city;
+
+    @Column(length = 20, nullable = false)
+    private String country;
 
     @Column(length = 15, nullable = false, unique = true)
     private String mobilePhone;
@@ -37,5 +46,8 @@ public class User {
     @OneToOne
     @JoinColumn(name = "user_credential_id")
     private UserCredential userCredential;
+
+    @OneToMany(mappedBy = "user")
+    private List<Transfer> transfers;
 
 }

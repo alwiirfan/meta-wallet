@@ -39,4 +39,10 @@ public class UserCredential {
     @OneToOne(mappedBy = "userCredential")
     private Wallet wallet;
 
+    @OneToOne(mappedBy = "userCredential")
+    private User user;
+
+    @OneToOne(mappedBy = "userCredential")
+    private Admin admin;
+
 }

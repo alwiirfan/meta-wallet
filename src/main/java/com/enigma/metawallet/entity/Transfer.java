@@ -27,7 +27,7 @@ public class Transfer {
     @CreationTimestamp
     private LocalDateTime transDate;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 

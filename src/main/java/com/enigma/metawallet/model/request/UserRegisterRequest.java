@@ -27,5 +27,11 @@ public class UserRegisterRequest {
     private String address;
 
     @NotBlank
+    private String city;
+
+    @NotBlank
+    private String country;
+
+    @NotBlank
     private String mobilePhone;
 }
