@@ -6,7 +6,7 @@ import com.enigma.metawallet.model.response.WalletResponse;
 
 public interface WalletService {
 
-    Wallet createNewWallet(Wallet request);
+    Wallet create(Wallet request);
     WalletResponse topUpToWallet(WalletRequest request);
     WalletResponse getWalletById(String id);
 

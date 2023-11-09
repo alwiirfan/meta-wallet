@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
-public class AdminRegisterResponse {
-    private String name;
+public class RegisterResponse {
+    private String username;
     private String email;
-    private WalletResponse wallet;
 }

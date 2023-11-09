@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface UserService {
 
-    User createNewUser(User request);
+    User create(User request);
     List<UserResponse> getAllUserForAdmin();
     UserResponse getUserById(String id);
     UserResponse updateUser(UserRequest request);

@@ -26,24 +26,9 @@ public class UserServiceImpl implements UserService {
     private final ValidationUtil validationUtil;
 
     @Override
-    public User createNewUser(User request) {
+    public User create(User request) {
         validationUtil.validate(request);
-
-        try {
-            User user = User.builder()
-                    .name(request.getName())
-                    .email(request.getEmail())
-                    .address(request.getAddress())
-                    .country(request.getCountry())
-                    .city(request.getCity())
-                    .mobilePhone(request.getMobilePhone())
-                    .build();
-            userRepository.save(user);
-
-            return user;
-        }catch (DataIntegrityViolationException e){
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "User already exist");
-        }
+        return userRepository.save(request);
 
     }
 

@@ -13,10 +13,8 @@ import javax.validation.constraints.NotBlank;
 @Builder(toBuilder = true)
 public class AuthRequest {
 
-    @NotBlank
     private String name;
 
-    @NotBlank
     private String username;
 
     @NotBlank

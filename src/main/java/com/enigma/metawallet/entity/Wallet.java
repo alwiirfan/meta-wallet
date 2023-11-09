@@ -19,7 +19,6 @@ public class Wallet {
     @GeneratedValue(generator = "system-uuid")
     private String id;
 
-    @Column(nullable = false)
     private Long balance;
 
     @OneToOne(mappedBy = "wallet")

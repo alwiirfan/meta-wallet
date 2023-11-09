@@ -1,5 +1,6 @@
 package com.enigma.metawallet.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -24,8 +25,8 @@ public class User {
     @Column(length = 50)
     private String name;
 
-    @Temporal(TemporalType.DATE)
-    @Column(name = "date_of_birth")
+    @JsonFormat(pattern = "dd-MM-yyyy", shape = JsonFormat.Shape.STRING)
+    @Column(name = "date_of_birth", nullable = false)
     private Date dateOfBirth;
 
     @Column(length = 50, nullable = false, unique = true)
@@ -40,7 +41,7 @@ public class User {
     @Column(length = 20, nullable = false)
     private String country;
 
-    @Column(length = 15, nullable = false, unique = true)
+    @Column(name = "mobile_phone", length = 15, nullable = false, unique = true)
     private String mobilePhone;
 
     @OneToOne
