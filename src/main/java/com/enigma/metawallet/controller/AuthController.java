@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/v1/auth")
@@ -22,7 +24,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping(path = "/register")
-    public ResponseEntity<?> register(@RequestBody UserRegisterRequest request){
+    public ResponseEntity<?> register(@Valid @RequestBody UserRegisterRequest request){
         RegisterResponse registerResponse = authService.userRegister(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(CommonResponse.<RegisterResponse>builder()
@@ -33,7 +35,7 @@ public class AuthController {
     }
 
     @PostMapping(path = "/register/admin")
-    public ResponseEntity<?> registerAdmin(@RequestBody AuthRequest request){
+    public ResponseEntity<?> registerAdmin(@Valid @RequestBody AuthRequest request){
         RegisterResponse registerResponse = authService.adminRegister(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(CommonResponse.<RegisterResponse>builder()
@@ -44,7 +46,7 @@ public class AuthController {
     }
 
     @PostMapping(path = "/login")
-    public ResponseEntity<?> login(@RequestBody AuthRequest request){
+    public ResponseEntity<?> login(@Valid @RequestBody AuthRequest request){
         LoginResponse loginResponse = authService.login(request);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CommonResponse.<LoginResponse>builder()

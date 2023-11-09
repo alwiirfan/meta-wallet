@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.Pattern;
 import java.util.Date;
 
 @Data
@@ -20,7 +20,7 @@ public class UserRegisterRequest {
     @NotBlank
     private String email;
 
-    @NotBlank
+    @Pattern(regexp = "^[a-zA-Z0-9]{10}")
     private String password;
 
     @NotBlank
@@ -38,7 +38,8 @@ public class UserRegisterRequest {
     @NotBlank
     private String mobilePhone;
 
-    @JsonFormat(pattern = "dd-MM-yyyy")
-    private Date dateOfBirth;
+    @NotBlank
+    @Pattern(regexp = "^\\d{2}-\\d{2}-\\d{4}$", message = "please use format dd-MM-yyyy")
+    private String dateOfBirth;
 
 }

@@ -5,7 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Pattern;
 
 @Data
 @AllArgsConstructor
@@ -17,10 +18,10 @@ public class AuthRequest {
 
     private String username;
 
-    @NotBlank
+    @Email(message = "Please enter a valid email!")
     private String email;
 
-    @NotBlank
+    @Pattern(regexp = "^[a-zA-Z0-9]{10}")
     private String password;
 
 }

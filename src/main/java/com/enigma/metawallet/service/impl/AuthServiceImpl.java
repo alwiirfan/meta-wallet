@@ -71,7 +71,7 @@ public class AuthServiceImpl implements AuthService {
                     .mobilePhone(request.getMobilePhone())
                     .userCredential(userCredential)
                     .wallet(wallet)
-                    .dateOfBirth(request.getDateOfBirth())
+                    .dateOfBirth(LocalDate.parse(request.getDateOfBirth(), DateTimeFormatter.ofPattern("dd-MM-yyyy")))
                     .build();
             userService.create(user);
 
