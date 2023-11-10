@@ -13,7 +13,8 @@ import java.time.LocalDateTime;
 @Builder(toBuilder = true)
 public class TransferResponse {
     private String id;
-    private String deliverToUsername;
-    private Long totalBalanceSent;
+    private String fromUserId;
+    private String toUserId;
+    private Long nominalTransfer;
     private LocalDateTime transDate;
 }

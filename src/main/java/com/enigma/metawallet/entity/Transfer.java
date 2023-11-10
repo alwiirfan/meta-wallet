@@ -21,14 +21,19 @@ public class Transfer {
     @GeneratedValue(generator = "system-uuid")
     private String id;
 
-    @Column(nullable = false)
-    private Long balance;
+    @Column(name = "transfer_in")
+    private Long transferIn;
 
-    @CreationTimestamp
+    @Column(name = "transfer_out")
+    private Long transferOut;
+
+    @Column(name = "from_user_id", nullable = false)
+    private String fromUserId;
+
+    @Column(name = "to_user_id", nullable = false)
+    private String toUserId;
+
+    @Column(name = "trans_date")
     private LocalDateTime transDate;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
 
 }
