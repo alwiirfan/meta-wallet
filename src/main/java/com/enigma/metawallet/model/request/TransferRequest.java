@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class TransferRequest {
-    private String deliverToUsername;
-    private Long balance;
+    private String fromUserId;
+    private String toUserId;
+    private Long nominalTransfer;
 }

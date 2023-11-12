@@ -24,8 +24,9 @@ public class User {
     @Column(length = 50)
     private String name;
 
-    @Column(name = "date_of_birth", nullable = false)
-    private LocalDate dateOfBirth;
+    @Temporal(TemporalType.DATE)
+    @Column(name = "date_of_birth")
+    private Date dateOfBirth;
 
     @Column(length = 50, nullable = false, unique = true)
     private String email;
@@ -39,15 +40,12 @@ public class User {
     @Column(length = 20, nullable = false)
     private String country;
 
-    @Column(name = "mobile_phone", length = 15, nullable = false, unique = true)
+    @Column(length = 15, nullable = false, unique = true)
     private String mobilePhone;
 
     @OneToOne
     @JoinColumn(name = "user_credential_id")
     private UserCredential userCredential;
-
-    @OneToMany(mappedBy = "user")
-    private List<Transfer> transfers;
 
     @OneToOne
     @JoinColumn(name = "wallet_id")
