@@ -6,19 +6,31 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Component
 @Slf4j
 public class JwtUtils {
 
-    @Value("secret")
+    private final Set<String> tokenBlacklist = new HashSet<>();
+
+    @Value("${metawallet.app.jwtSecret}")
     private String jwtSecret;
 
-    @Value("86400000")
+    @Value("${metawallet.app.jwtExpirationMs}")
     private Long jwtExpiration;
 
     public String getEmailByToken(String token){
-        return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
+        try {
+            log.info("Received JWT token : {}", token);
+
+            Claims claims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
+            return claims.getSubject();
+        } catch (Exception e) {
+            log.error("Error decoding JWT token : {}", e.getMessage());
+            throw new RuntimeException("Unable to read email from token");
+        }
     }
 
     public String generateToken(String email){
@@ -44,6 +56,14 @@ public class JwtUtils {
             log.error("JWT claims string is empty {}", e.getMessage());
         }
         return false;
+    }
+
+    public void addToBlacklist(String token) {
+        tokenBlacklist.add(token);
+    }
+
+    public boolean isTokenBlacklisted(String token) {
+        return tokenBlacklist.contains(token);
     }
 
 }

@@ -1,6 +1,5 @@
 package com.enigma.metawallet.model.request;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
-import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -20,7 +18,8 @@ public class UserRegisterRequest {
     @NotBlank
     private String email;
 
-    @Pattern(regexp = "^[a-zA-Z0-9]{10}", message = "please you must enter 10 characters!")
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[A-Za-z\\d#$@!%&*?]{8,20}$",
+            message = "please must enter min 1 uppercase, min 1 lowercase, min 1 special character, min 1 number, min 8 characters and max 20 characters")
     private String password;
 
     @NotBlank

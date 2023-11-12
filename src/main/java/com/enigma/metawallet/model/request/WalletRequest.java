@@ -13,9 +13,8 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class WalletRequest {
-
     @NotNull
-    private String id;
+    private String userId;
 
     @Min(value = 50000)
     private Long balance;

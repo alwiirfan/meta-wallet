@@ -4,7 +4,6 @@ import com.enigma.metawallet.entity.*;
 import com.enigma.metawallet.entity.roleContract.ERole;
 import com.enigma.metawallet.model.request.AuthRequest;
 import com.enigma.metawallet.model.request.UserRegisterRequest;
-import com.enigma.metawallet.model.request.WalletRequest;
 import com.enigma.metawallet.model.response.*;
 import com.enigma.metawallet.repository.UserCredentialRepository;
 import com.enigma.metawallet.security.BCryptUtils;
@@ -12,6 +11,7 @@ import com.enigma.metawallet.security.JwtUtils;
 import com.enigma.metawallet.service.*;
 import com.enigma.metawallet.util.ValidationUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,16 +22,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthServiceImpl implements AuthService {
 
     private final UserCredentialRepository userCredentialRepository;
@@ -48,7 +46,7 @@ public class AuthServiceImpl implements AuthService {
     public RegisterResponse userRegister(UserRegisterRequest request) {
         validationUtil.validate(request);
         try {
-            Role role = roleService.getOrSave(ERole.USER);
+            Role role = roleService.getOrSave(ERole.ROLE_USER);
             UserCredential userCredential = UserCredential.builder()
                     .username(request.getUsername())
                     .email(request.getEmail())
@@ -58,7 +56,7 @@ public class AuthServiceImpl implements AuthService {
             userCredentialRepository.saveAndFlush(userCredential);
 
             Wallet wallet = Wallet.builder()
-                    .balance(null)
+                    .balance(0L)
                     .build();
             walletService.create(wallet);
 
@@ -90,7 +88,7 @@ public class AuthServiceImpl implements AuthService {
     public RegisterResponse adminRegister(AuthRequest request) {
         validationUtil.validate(request);
         try {
-            Role role = roleService.getOrSave(ERole.ADMIN);
+            Role role = roleService.getOrSave(ERole.ROLE_ADMIN);
             UserCredential userCredential = UserCredential.builder()
                     .email(request.getEmail())
                     .username(request.getUsername())
@@ -100,7 +98,7 @@ public class AuthServiceImpl implements AuthService {
             userCredentialRepository.saveAndFlush(userCredential);
 
             Wallet wallet = Wallet.builder()
-                    .balance(null)
+                    .balance(0L)
                     .build();
             walletService.create(wallet);
 
@@ -141,5 +139,27 @@ public class AuthServiceImpl implements AuthService {
                 .roles(roles)
                 .token(token)
                 .build();
+    }
+
+    @Override
+    public void logout(String token) {
+        validationUtil.validate(token);
+
+        try {
+            String email = jwtUtils.getEmailByToken(token);
+            jwtUtils.addToBlacklist(token);
+            log.info("Successful logout from the account with email: {}", email);
+
+            boolean tokenBlacklisted = jwtUtils.isTokenBlacklisted(token);
+            if (tokenBlacklisted){
+                log.info("Successful logout from your account");
+            }else {
+                log.error("Token is not valid");
+            }
+        }catch (RuntimeException e){
+            log.error("Error during logout: {}", e.getMessage());
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired token");
+        }
+
     }
 }
