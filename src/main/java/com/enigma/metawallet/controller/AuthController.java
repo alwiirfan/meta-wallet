@@ -7,12 +7,10 @@ import com.enigma.metawallet.model.response.LoginResponse;
 import com.enigma.metawallet.model.response.RegisterResponse;
 import com.enigma.metawallet.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -56,4 +54,18 @@ public class AuthController {
                         .build());
     }
 
+    @PostMapping(path = "/logout")
+    public ResponseEntity<?> logout(@RequestHeader(name = HttpHeaders.AUTHORIZATION) String token){
+        String cleanedToken = cleanToken(token);
+        authService.logout(cleanedToken);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(CommonResponse.<String>builder()
+                        .statusCode(HttpStatus.OK.value())
+                        .message("Successful logout from your account")
+                        .build());
+    }
+
+    private String cleanToken(String token) {
+        return token.replace("Bearer ", ""); // Hapus "Bearer " dari awal token jika ada
+    }
 }

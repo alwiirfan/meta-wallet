@@ -21,7 +21,8 @@ public class AuthRequest {
     @Email(message = "Please enter a valid email!")
     private String email;
 
-    @Pattern(regexp = "^[a-zA-Z0-9]{10}")
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[A-Za-z\\d#$@!%&*?]{8,20}$",
+            message = "please must enter min 1 uppercase, min 1 lowercase, min 1 number, min 8 characters and max 20 characters")
     private String password;
 
 }

@@ -13,7 +13,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.stereotype.Component;
+
 
 @Component
 @EnableWebSecurity
@@ -23,6 +25,7 @@ public class SecurityConfiguration {
     private final AuthTokenFilter authTokenFilter;
     private final AuthEntryPoint authEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
+    private final JwtUtils jwtUtils;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -41,10 +44,21 @@ public class SecurityConfiguration {
                 .exceptionHandling().accessDeniedHandler(customAccessDeniedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
-                .antMatchers("/api/v1/auth/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/v1/products").permitAll()
-                .anyRequest().permitAll()
-                .and().addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class)
+                .antMatchers("/v1/auth/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/v1/users", "/v1/admin").hasRole("ADMIN")
+                .antMatchers(HttpMethod.DELETE, "/v1/users/{id}").hasRole("ADMIN")
+                .antMatchers(HttpMethod.GET, "/v1/users/{id}/wallet", "/v1/users/{id}").hasRole("USER")
+                .antMatchers(HttpMethod.PATCH, "/v1/users/wallet", "/v1/users/{id}").hasRole("USER")
+                .antMatchers(HttpMethod.PUT, "/v1/users").hasRole("USER")
+                .antMatchers(HttpMethod.POST, "/v1/auth/logout").authenticated()
+                .anyRequest().authenticated().and()
+                .addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
+
+    @Bean
+    public LogoutSuccessHandler logoutSuccessHandler(){
+        return new CustomLogoutSuccessHandler(jwtUtils);
+    }
+
 }

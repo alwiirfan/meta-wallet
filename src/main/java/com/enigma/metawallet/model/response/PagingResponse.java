@@ -5,14 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
-public class LoginResponse {
-    private String email;
-    private List<String> roles;
-    private String token;
+public class PagingResponse {
+    private Integer count;
+    private Integer totalPages;
+    private Integer size;
+    private Integer page;
 }

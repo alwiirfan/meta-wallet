@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class WalletResponse {
-    private String id;
+    private String userId;
+    private String walletId;
     private Long balance;
 }

@@ -4,10 +4,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 public enum ERole {
-    USER,
-    ADMIN;
+    ROLE_USER,
+    ROLE_ADMIN;
 
-    public static ERole getRole(String value){
+    public static ERole get(String value){
         for (ERole role : ERole.values()){
             if (role.name().equalsIgnoreCase(value)) return role;
         }
