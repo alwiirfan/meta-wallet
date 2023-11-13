@@ -16,5 +16,7 @@ public class TransferResponse {
     private String fromUserId;
     private String toUserId;
     private Long nominalTransfer;
+    private Long tax;
+    private Long total;
     private LocalDateTime transDate;
 }
