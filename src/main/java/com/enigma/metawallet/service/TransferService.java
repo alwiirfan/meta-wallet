@@ -12,4 +12,5 @@ public interface TransferService {
     List<Transfer> getAllTransferHistoryByUserId(String userId);
     List<Transfer> getAllInTransferHistoryByUserId(String userId);
     List<Transfer> getAllOutTransferHistoryByUserId(String userId);
+
 }

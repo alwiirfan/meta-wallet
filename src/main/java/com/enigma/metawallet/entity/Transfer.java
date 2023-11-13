@@ -36,4 +36,7 @@ public class Transfer {
     @Column(name = "trans_date")
     private LocalDateTime transDate;
 
+    @Column(name = "tax")
+    private Long tax;
+
 }
