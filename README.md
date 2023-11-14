@@ -20,6 +20,11 @@ git clone https://git.enigmacamp.com/enigma-camp/enigmacamp-2.0/batch-11-java/te
 mvn clean test
 ```
 
+## How to Run Application:
+```
+mvn spring-boot:run
+```
+
 ## Noted:
 - Make sure you have done the proper configuration in the `application.properties` file.
 
