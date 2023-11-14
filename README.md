@@ -308,7 +308,7 @@ mvn spring-boot:run
 }
 ```
 
-### Delete USer By User Id `[ADMIN]`
+### Delete User By User Id `[ADMIN]`
 #### Request:
 - Method: DELETE
 - Endpoint: `/v1/users/{userId}`

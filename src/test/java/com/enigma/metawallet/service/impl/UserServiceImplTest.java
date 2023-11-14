@@ -14,6 +14,7 @@ import com.enigma.metawallet.service.AdminService;
 import com.enigma.metawallet.service.UserCredentialService;
 import com.enigma.metawallet.service.UserService;
 import com.enigma.metawallet.service.WalletService;
+import com.enigma.metawallet.util.AccountUtil;
 import com.enigma.metawallet.util.ValidationUtil;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -56,9 +57,11 @@ class UserServiceImplTest {
     //user
     private final UserRepository userRepository = mock(UserRepository.class);
 
+    private final AccountUtil accountUtil = mock(AccountUtil.class);
+
     @InjectMocks
     private final UserService userService = new UserServiceImpl(userRepository, walletService, adminService,
-            userCredentialService, validationUtil, passwordEncoder);
+            userCredentialService, validationUtil, accountUtil, passwordEncoder);
 
     @Test
     void itShouldReturnUserWhenCreateNewUser() {

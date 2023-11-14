@@ -14,6 +14,7 @@ import com.enigma.metawallet.service.AdminService;
 import com.enigma.metawallet.service.UserCredentialService;
 import com.enigma.metawallet.service.UserService;
 import com.enigma.metawallet.service.WalletService;
+import com.enigma.metawallet.util.AccountUtil;
 import com.enigma.metawallet.util.ValidationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,6 +42,7 @@ public class UserServiceImpl implements UserService {
     private final AdminService adminService;
     private final UserCredentialService userCredentialService;
     private final ValidationUtil validationUtil;
+    private final AccountUtil accountUtil;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -75,113 +78,170 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse getUserById(String id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User is not found"));
+        try {
+            UserDetailImpl userDetail = accountUtil.blockAccount();
+            User user = userRepository.findById(id)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User is not found"));
+            if (user != null && user.getUserCredential().getEmail().equals(userDetail.getEmail())){
+                return toUserResponse(user);
+            }else {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized access");
+            }
 
-        return toUserResponse(user);
+        }catch (RuntimeException e){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
     }
 
     @Override
     public WalletResponse getWalletByUserId(String id) {
-        Wallet wallet = userRepository.findWalletByUserId(id);
-        if (wallet == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Wallet not found");
+        try {
+            UserDetailImpl userDetail = accountUtil.blockAccount();
+            User user = userRepository.findById(id).orElse(null);
+            if (user != null && user.getUserCredential().getEmail().equals(userDetail.getEmail())){
+
+                Wallet wallet = userRepository.findWalletByUserId(id);
+                if (wallet == null){
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Wallet not found");
+                }
+
+                return WalletResponse.builder()
+                        .userId(id)
+                        .walletId(wallet.getId())
+                        .balance(wallet.getBalance())
+                        .build();
+
+            }else {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized access");
+            }
+
+        }catch (RuntimeException e){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
 
-        return WalletResponse.builder()
-                .userId(id)
-                .walletId(wallet.getId())
-                .balance(wallet.getBalance())
-                .build();
     }
 
     @Override
     public WalletResponse topUpWallet(WalletRequest request) {
-        validationUtil.validate(request);
+        try {
+            validationUtil.validate(request);
 
-        // User
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User is not found"));
+            UserDetailImpl userDetail = accountUtil.blockAccount();
 
-        Wallet userWallet = user.getWallet();
-        if (userWallet == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Wallet is not found for the user");
+            // User
+            User user = userRepository.findById(request.getUserId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User is not found"));
+            if (user != null && user.getUserCredential().getEmail().equals(userDetail.getEmail())){
+                Wallet userWallet = user.getWallet();
+                if (userWallet == null) {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Wallet is not found for the user");
+                }
+
+                double adminFeePercent = 0.001;
+                double adminFeeAmount = request.getBalance() * adminFeePercent; // untuk mendapatkan total biaya admin
+
+                long topUpAmountAfterFee = (long) Math.max(0, Math.round(request.getBalance()) - adminFeeAmount); // request user dikurangi total biaya admin
+
+                Long newUserBalance = userWallet.getBalance() == null ? 0 : userWallet.getBalance() + topUpAmountAfterFee;
+                userWallet.setBalance(newUserBalance);
+                walletService.update(userWallet);
+
+                // Admin
+                Admin admin = adminService.getById(1L);
+
+                Wallet adminWallet = admin.getWallet();
+                if (adminWallet == null) {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Wallet is not found for the admin");
+                }
+
+                Long adminWalletBalance = adminWallet.getBalance();
+                Long newAdminBalance = (adminWalletBalance == null ? 0 : adminWalletBalance) + Math.round(adminFeeAmount); // menambahkan hasil total biaya admin dari user request ke wallet admin
+
+                adminWallet.setBalance(newAdminBalance);
+                walletService.update(adminWallet);
+
+                return WalletResponse.builder()
+                        .userId(user.getId())
+                        .walletId(userWallet.getId())
+                        .balance(newUserBalance)
+                        .build();
+            }else {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized access");
+            }
+
+        }catch (RuntimeException e){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
-
-        double adminFeePercent = 0.001;
-        double adminFeeAmount = request.getBalance() * adminFeePercent; // untuk mendapatkan total biaya admin
-
-        long topUpAmountAfterFee = (long) Math.max(0, Math.round(request.getBalance()) - adminFeeAmount); // request user dikurangi total biaya admin
-
-        Long newUserBalance = userWallet.getBalance() == null ? 0 : userWallet.getBalance() + topUpAmountAfterFee;
-        userWallet.setBalance(newUserBalance);
-        walletService.update(userWallet);
-
-        // Admin
-        Admin admin = adminService.getById(1L);
-
-        Wallet adminWallet = admin.getWallet();
-        if (adminWallet == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Wallet is not found for the admin");
-        }
-
-        Long adminWalletBalance = adminWallet.getBalance();
-        Long newAdminBalance = (adminWalletBalance == null ? 0 : adminWalletBalance) + Math.round(adminFeeAmount); // menambahkan hasil total biaya admin dari user request ke wallet admin
-
-        adminWallet.setBalance(newAdminBalance);
-        walletService.update(adminWallet);
-
-        return WalletResponse.builder()
-                .userId(user.getId())
-                .walletId(userWallet.getId())
-                .balance(newUserBalance)
-                .build();
     }
 
 
     @Override
     public UserResponse updateUser(UserRequest request) {
-        validationUtil.validate(request);
-        User user = userRepository.findById(request.getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User is not found"));
+        try {
+            validationUtil.validate(request);
 
-        User build = User.builder()
-                .id(request.getId())
-                .name(request.getName())
-                .city(request.getCity())
-                .email(user.getEmail())
-                .address(request.getAddress())
-                .country(request.getCountry())
-                .mobilePhone(request.getMobilePhone())
-                .dateOfBirth(user.getDateOfBirth())
-                .wallet(user.getWallet())
-                .userCredential(user.getUserCredential())
-                .build();
-        userRepository.save(build);
-        return toUserResponse(build);
+            UserDetailImpl userDetail = accountUtil.blockAccount();
+
+            User user = userRepository.findById(request.getId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User is not found"));
+            if (user != null && user.getUserCredential().getEmail().equals(userDetail.getEmail())){
+                User build = User.builder()
+                        .id(request.getId())
+                        .name(request.getName())
+                        .city(request.getCity())
+                        .email(user.getEmail())
+                        .address(request.getAddress())
+                        .country(request.getCountry())
+                        .mobilePhone(request.getMobilePhone())
+                        .dateOfBirth(user.getDateOfBirth())
+                        .wallet(user.getWallet())
+                        .userCredential(user.getUserCredential())
+                        .build();
+                userRepository.save(build);
+                return toUserResponse(build);
+            }else {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized access");
+            }
+
+        }catch (RuntimeException e){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
     }
 
     @Override
     public void changePassword(String userId, ChangePasswordRequest request) {
-        validationUtil.validate(request);
+        try {
+            validationUtil.validate(request);
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User is not found"));
+            UserDetailImpl userDetail = accountUtil.blockAccount();
 
-        UserCredential userUserCredential = user.getUserCredential();
-        if (userUserCredential == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User credential is not found for the user");
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User is not found"));
+
+            UserCredential userUserCredential = user.getUserCredential();
+            if (userUserCredential == null){
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User credential is not found for the user");
+            }
+
+            if (userUserCredential.getEmail().equals(userDetail.getEmail())){
+
+                if(!passwordEncoder.matches(request.getCurrentPassword(), userUserCredential.getPassword())){ // memeriksa apakah password saat ini sudah cocok
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Wrong old password");
+                }
+                if (!request.getNewPassword().equals(request.getConfirmationPassword())){ // memeriksa apakah password baru dan konfirmasi password baru sudah sesuai
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "New password and confirmation not same");
+                }
+
+                userUserCredential.setPassword(passwordEncoder.encode(request.getNewPassword()));
+
+                userCredentialService.create(userUserCredential);
+            }else {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized access");
+            }
+
+        }catch (RuntimeException e){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
-
-        if(!passwordEncoder.matches(request.getCurrentPassword(), userUserCredential.getPassword())){ // memeriksa apakah password saat ini sudah cocok
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Wrong old password");
-        }
-        if (!request.getNewPassword().equals(request.getConfirmationPassword())){ // memeriksa apakah password baru dan konfirmasi password baru sudah sesuai
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "New password and confirmation not same");
-        }
-
-        userUserCredential.setPassword(passwordEncoder.encode(request.getNewPassword()));
-        userCredentialService.create(userUserCredential);
     }
 
     @Override
