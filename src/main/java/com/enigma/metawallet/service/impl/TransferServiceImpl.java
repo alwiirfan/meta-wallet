@@ -37,7 +37,7 @@ public class TransferServiceImpl implements TransferService {
         Wallet walletAdmin = adminRepository.findWalletByAdminId(1L);
         Long totalTransfer24hours = transferRepository.countByFromUserIdAndTransferOutIsNotNullAndTransDateAfter(transferRequest.getFromUserId(), LocalDateTime.now().minusHours(24));
         if ( fromUserWallet != null &&  toUserWallet != null && fromUserWallet.getBalance()>50000 &&
-                transferRequest.getNominalTransfer()<25000000&&transferRequest.getNominalTransfer()>0 && totalTransfer24hours<=1000) {
+                transferRequest.getNominalTransfer()<25000000&&transferRequest.getNominalTransfer()>0 && totalTransfer24hours<=5) {
             if (fromUserWallet.getBalance() - transferRequest.getNominalTransfer() > 15000) {
 
                 fromUserWallet.setBalance(fromUserWallet.getBalance() - transferRequest.getNominalTransfer() - 1500);

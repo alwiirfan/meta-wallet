@@ -24,10 +24,6 @@ public class UserCredentialServiceImpl implements UserCredentialService {
 
     @Override
     public void update(UserCredential userCredential) {
-        if (userCredential.getId() == null){
-            throw new IllegalArgumentException("User crendential Id cannot be null");
-        }
-
         UserCredential currentUserCredential = userCredentialRepository.findById(userCredential.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User credential is not found"));
 

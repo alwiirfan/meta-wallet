@@ -181,7 +181,7 @@ public class UserServiceImpl implements UserService {
         }
 
         userUserCredential.setPassword(passwordEncoder.encode(request.getNewPassword()));
-        userCredentialService.update(userUserCredential);
+        userCredentialService.create(userUserCredential);
     }
 
     @Override
