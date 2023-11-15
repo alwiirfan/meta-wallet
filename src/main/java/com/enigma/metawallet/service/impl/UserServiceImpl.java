@@ -82,14 +82,17 @@ public class UserServiceImpl implements UserService {
             UserDetailImpl userDetail = accountUtil.blockAccount();
             User user = userRepository.findById(id)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User is not found"));
-            if (user != null && user.getUserCredential().getEmail().equals(userDetail.getEmail())){
+            if (user != null && user.getUserCredential() != null && user.getUserCredential().getEmail().equals(userDetail.getEmail())){
                 return toUserResponse(user);
             }else {
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized access");
             }
 
-        }catch (RuntimeException e){
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }catch (ResponseStatusException e){
+            e.printStackTrace();
+            return new UserResponse();
+        }catch (RuntimeException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error cannot to access this account");
         }
     }
 
@@ -98,7 +101,7 @@ public class UserServiceImpl implements UserService {
         try {
             UserDetailImpl userDetail = accountUtil.blockAccount();
             User user = userRepository.findById(id).orElse(null);
-            if (user != null && user.getUserCredential().getEmail().equals(userDetail.getEmail())){
+            if (user != null && user.getUserCredential() != null && user.getUserCredential().getEmail().equals(userDetail.getEmail())){
 
                 Wallet wallet = userRepository.findWalletByUserId(id);
                 if (wallet == null){
@@ -106,7 +109,7 @@ public class UserServiceImpl implements UserService {
                 }
 
                 return WalletResponse.builder()
-                        .userId(id)
+                        .userId(user.getId())
                         .walletId(wallet.getId())
                         .balance(wallet.getBalance())
                         .build();
@@ -115,6 +118,9 @@ public class UserServiceImpl implements UserService {
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized access");
             }
 
+        }catch (ResponseStatusException e){
+            e.printStackTrace();
+            return new WalletResponse();
         }catch (RuntimeException e){
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
