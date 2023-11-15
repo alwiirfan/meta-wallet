@@ -15,7 +15,7 @@ public class ChangePasswordRequest {
     private String currentPassword;
 
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[A-Za-z\\d#$@!%&*?]{8,20}$",
-            message = "please must enter min 1 uppercase, min 1 lowercase, min 1 special character, min 1 number, min 8 characters and max 20 characters")
+            message = "please must enter min 1 uppercase, min 1 lowercase, min 1 number, min 8 characters and max 20 characters")
     private String newPassword;
 
     private String confirmationPassword;

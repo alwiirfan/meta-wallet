@@ -93,7 +93,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(CommonResponse.builder()
                         .statusCode(HttpStatus.OK.value())
-                        .message("Successful to change password you account")
+                        .message("Successful to change password your account")
                         .build());
     }
 
