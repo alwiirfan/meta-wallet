@@ -179,8 +179,6 @@ public class UserServiceImpl implements UserService {
 
         } catch (ResponseStatusException e) {
             e.printStackTrace();
-            return new WalletResponse();
-        } catch (RuntimeException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
