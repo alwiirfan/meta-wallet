@@ -1,0 +1,41 @@
+version: '3'
+services:
+
+  postgresql:
+    container_name: postgresql
+    environment:
+      - POSTGRES_PASSWORD=123
+      - POSTGRES_DB=meta_wallet
+    networks:
+      - app-network
+    volumes:
+      - "postgres-data:/var/lib/postgresql/data"
+    image: postgres
+
+  app-metawallet:
+    image: app-metawallet
+    container_name: app-metawallet-container
+    depends_on:
+      - postgresql
+    environment:
+      - DB_HOST=postgresql
+      - DB_PORT=5432
+      - APP_PORT=8090
+      - DB_NAME=meta_wallet
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=123
+      - JWT_SECRET=SECRET
+      - JWT_EXPIRATION=86400000
+    ports:
+      - "8080:8080"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - app-network
+
+volumes:
+  postgres-data:
+networks:
+  app-network:
+    driver: bridge
