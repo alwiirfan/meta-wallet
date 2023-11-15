@@ -9,7 +9,7 @@ WORKDIR /app
 
 # Salin file JAR aplikasi dari direktori target (pastikan aplikasi sudah dibuild sebelumnya)
 
-COPY target/simple-todo-0.0.1-SNAPSHOT.jar /app/meta-wallet-0.0.1-SNAPSHOT.jar
+COPY target/meta-wallet-0.0.1-SNAPSHOT.jar /app/meta-wallet-0.0.1-SNAPSHOT.jar
 
 
 # Eksekusi perintah ketika container berjalan
