@@ -18,14 +18,16 @@ services:
     depends_on:
       - postgresql
     environment:
-      - HOST_DB=postgresql
-      - PORT_DB=5432
+      - DB_HOST=postgresql
+      - DB_PORT=5432
       - APP_PORT=8090
       - DB_NAME=meta_wallet
-      - USERNAME_DB=postgres
-      - PASSWORD_DB=123
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=123
+      - JWT_SECRET=SECRET
+      - JWT_EXPIRATION=86400000
     ports:
-      - "8080:8081"
+      - "8080:8080"
     build:
       context: .
       dockerfile: Dockerfile
