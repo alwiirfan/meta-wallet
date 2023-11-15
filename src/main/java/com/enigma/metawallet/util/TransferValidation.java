@@ -3,7 +3,6 @@ package com.enigma.metawallet.util;
 import com.enigma.metawallet.entity.Admin;
 import com.enigma.metawallet.entity.User;
 import com.enigma.metawallet.entity.Wallet;
-import com.enigma.metawallet.entity.roleContract.ERole;
 import com.enigma.metawallet.model.request.TransferRequest;
 import com.enigma.metawallet.repository.AdminRepository;
 import com.enigma.metawallet.repository.UserRepository;

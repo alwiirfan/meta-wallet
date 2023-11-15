@@ -1,6 +1,5 @@
 package com.enigma.metawallet.service.impl;
 
-import com.enigma.metawallet.entity.Admin;
 import com.enigma.metawallet.entity.Transfer;
 import com.enigma.metawallet.entity.User;
 import com.enigma.metawallet.entity.Wallet;
@@ -79,7 +78,7 @@ public class TransferServiceImpl implements TransferService {
                     .transDate(from.getTransDate())
                     .build();
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "your userId is not valid");
+        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error cannot to access this account");
             }
 
 
@@ -90,7 +89,7 @@ public class TransferServiceImpl implements TransferService {
         if (checkAccess&&user!=null) {
             return transferRepository.findAllTransfersByUserIdWithTransfer(userId);
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "your userId is not valid");
+        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error cannot to access this account");
     }
 
     @Override
@@ -100,7 +99,7 @@ public class TransferServiceImpl implements TransferService {
         if (checkAccess&&user!=null) {
             return transferRepository.findAllByFromUserIdAndTransferOutIsNotNull(userId);
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "your userId is not valid");
+        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error cannot to access this account");
     }
 
     @Override
@@ -110,5 +109,5 @@ public class TransferServiceImpl implements TransferService {
         if (checkAccess&&user!=null) {
             return transferRepository.findAllByToUserIdAndTransferInIsNotNull(userId);
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "your userId is not valid");
+        throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error cannot to access this account");
 }}

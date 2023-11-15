@@ -90,7 +90,7 @@ public class UserServiceImpl implements UserService {
                 assert user != null;
                 return toUserResponse(user);
             }else {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized access");
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error cannot to access this account");
             }
 
         }catch (ResponseStatusException e){
@@ -121,7 +121,7 @@ public class UserServiceImpl implements UserService {
                         .build();
 
             }  else {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized access");
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error cannot to access this account");
             }
 
         }catch (ResponseStatusException e){
@@ -176,7 +176,7 @@ public class UserServiceImpl implements UserService {
                         .balance(newUserBalance)
                         .build();
             } else {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized access");
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error cannot to access this account");
             }
 
         } catch (ResponseStatusException e) {
@@ -211,7 +211,7 @@ public class UserServiceImpl implements UserService {
                 userRepository.save(build);
                 return toUserResponse(build);
             }else {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized access");
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error cannot to access this account");
             }
 
         }catch (RuntimeException e){
@@ -247,7 +247,7 @@ public class UserServiceImpl implements UserService {
 
                 userCredentialService.create(userUserCredential);
             }else {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized access");
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error cannot to access this account");
             }
 
         }catch (RuntimeException e){

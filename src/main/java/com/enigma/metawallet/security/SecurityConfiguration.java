@@ -47,8 +47,10 @@ public class SecurityConfiguration {
                 .antMatchers("/v1/auth/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/v1/users", "/v1/admin").hasRole("ADMIN")
                 .antMatchers(HttpMethod.DELETE, "/v1/users/{id}").hasRole("ADMIN")
+                .antMatchers(HttpMethod.GET, "/v1/users/{id}", "/v1/transfer/history/{userId}",
+                        "/v1/transfer/inhistory/{userId}", "/v1/transfer/outhistory/{userId}").authenticated()
+                .antMatchers(HttpMethod.POST, "/v1/transfer").hasRole("USER")
                 .antMatchers(HttpMethod.GET, "/v1/users/{id}/wallet").hasRole("USER")
-                .antMatchers(HttpMethod.GET, "/v1/users/{id}").authenticated()
                 .antMatchers(HttpMethod.PATCH, "/v1/users/wallet", "/v1/users/{id}").hasRole("USER")
                 .antMatchers(HttpMethod.PUT, "/v1/users").hasRole("USER")
                 .antMatchers(HttpMethod.POST, "/v1/auth/logout").authenticated()
