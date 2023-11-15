@@ -215,6 +215,7 @@ class UserServiceImplTest {
     @Test
     void itShouldBeTopUpWalletByUserIdAndReturnWalletResponse() {
         Long adminId = 1L;
+        String userId = "1";
 
         UserDetailImpl userDetail = new UserDetailImpl();
         userDetail.setEmail("test@example.com");
@@ -225,7 +226,7 @@ class UserServiceImplTest {
 
         //dummy user
         User dummyUser = new User();
-        dummyUser.setId("1");
+        dummyUser.setId(userId);
         dummyUser.setEmail("test@example.com");
         dummyUser.setCity("city");
         dummyUser.setUserCredential(userCredential);
@@ -237,7 +238,7 @@ class UserServiceImplTest {
 
         // dummy wallet request
         WalletRequest walletRequest = new WalletRequest();
-        walletRequest.setUserId(dummyUser.getId());
+        walletRequest.setUserId(userId);
         walletRequest.setBalance(50000L);
         validationUtil.validate(walletRequest);
 
@@ -247,6 +248,7 @@ class UserServiceImplTest {
 
         when(accountUtil.blockAccount()).thenReturn(userDetail);
         when(userRepository.findById(dummyUser.getId())).thenReturn(Optional.of(dummyUser));
+        when(walletService.create(any(Wallet.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(adminService.getById(adminId)).thenReturn(dummyAdmin);
 
         WalletResponse walletResponse = userService.topUpWallet(walletRequest);
