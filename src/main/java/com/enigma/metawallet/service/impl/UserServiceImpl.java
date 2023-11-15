@@ -82,7 +82,11 @@ public class UserServiceImpl implements UserService {
             UserDetailImpl userDetail = accountUtil.blockAccount();
             User user = userRepository.findById(id)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User is not found"));
+            Admin admin = adminService.getById(1L);
             if (user != null && user.getUserCredential() != null && user.getUserCredential().getEmail().equals(userDetail.getEmail())){
+                return toUserResponse(user);
+            } else if (admin != null && admin.getUserCredential() != null && admin.getUserCredential().getEmail().equals(userDetail.getEmail())) {
+                assert user != null;
                 return toUserResponse(user);
             }else {
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized access");
@@ -90,7 +94,7 @@ public class UserServiceImpl implements UserService {
 
         }catch (ResponseStatusException e){
             e.printStackTrace();
-            return new UserResponse();
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error cannot to access this account");
         }catch (RuntimeException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error cannot to access this account");
         }
@@ -100,7 +104,8 @@ public class UserServiceImpl implements UserService {
     public WalletResponse getWalletByUserId(String id) {
         try {
             UserDetailImpl userDetail = accountUtil.blockAccount();
-            User user = userRepository.findById(id).orElse(null);
+            User user = userRepository.findById(id)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User is not found"));
             if (user != null && user.getUserCredential() != null && user.getUserCredential().getEmail().equals(userDetail.getEmail())){
 
                 Wallet wallet = userRepository.findWalletByUserId(id);
@@ -114,14 +119,12 @@ public class UserServiceImpl implements UserService {
                         .balance(wallet.getBalance())
                         .build();
 
-            }else {
+            }  else {
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized access");
             }
 
         }catch (ResponseStatusException e){
             e.printStackTrace();
-            return new WalletResponse();
-        }catch (RuntimeException e){
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
 
@@ -137,7 +140,7 @@ public class UserServiceImpl implements UserService {
             // User
             User user = userRepository.findById(request.getUserId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User is not found"));
-            if (user != null && user.getUserCredential().getEmail().equals(userDetail.getEmail())){
+            if (user != null && user.getUserCredential() != null && user.getUserCredential().getEmail().equals(userDetail.getEmail())) {
                 Wallet userWallet = user.getWallet();
                 if (userWallet == null) {
                     throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Wallet is not found for the user");
@@ -154,7 +157,6 @@ public class UserServiceImpl implements UserService {
 
                 // Admin
                 Admin admin = adminService.getById(1L);
-
                 Wallet adminWallet = admin.getWallet();
                 if (adminWallet == null) {
                     throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Wallet is not found for the admin");
@@ -171,11 +173,14 @@ public class UserServiceImpl implements UserService {
                         .walletId(userWallet.getId())
                         .balance(newUserBalance)
                         .build();
-            }else {
+            } else {
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized access");
             }
 
-        }catch (RuntimeException e){
+        } catch (ResponseStatusException e) {
+            e.printStackTrace();
+            return new WalletResponse();
+        } catch (RuntimeException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }

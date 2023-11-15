@@ -27,7 +27,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -214,9 +213,6 @@ class UserServiceImplTest {
 
     @Test
     void itShouldBeTopUpWalletByUserIdAndReturnWalletResponse() {
-        Long adminId = 1L;
-        String userId = "1";
-
         UserDetailImpl userDetail = new UserDetailImpl();
         userDetail.setEmail("test@example.com");
 
@@ -226,7 +222,7 @@ class UserServiceImplTest {
 
         //dummy user
         User dummyUser = new User();
-        dummyUser.setId(userId);
+        dummyUser.setId("1");
         dummyUser.setEmail("test@example.com");
         dummyUser.setCity("city");
         dummyUser.setUserCredential(userCredential);
@@ -238,25 +234,29 @@ class UserServiceImplTest {
 
         // dummy wallet request
         WalletRequest walletRequest = new WalletRequest();
-        walletRequest.setUserId(userId);
+        walletRequest.setUserId(dummyUser.getId());
         walletRequest.setBalance(50000L);
-        validationUtil.validate(walletRequest);
+
+        doNothing().when(validationUtil).validate(walletRequest);
 
         //dummy wallet admin
         Admin dummyAdmin = new Admin();
+        dummyAdmin.setId(1L);
         dummyAdmin.setWallet(new Wallet());
 
         when(accountUtil.blockAccount()).thenReturn(userDetail);
         when(userRepository.findById(dummyUser.getId())).thenReturn(Optional.of(dummyUser));
-        when(walletService.create(any(Wallet.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(adminService.getById(adminId)).thenReturn(dummyAdmin);
+        doNothing().when(walletService).update(any(Wallet.class));
+        when(adminService.getById(anyLong())).thenReturn(dummyAdmin);
 
         WalletResponse walletResponse = userService.topUpWallet(walletRequest);
 
+        verify(validationUtil, times(1)).validate(walletRequest);
         verify(userRepository, times(1)).findById(dummyUser.getId());
-        verify(adminService, times(1)).getById(adminId);
-        verify(walletService, times(2)).create(any(Wallet.class));
+        verify(adminService, times(1)).getById(anyLong());
+        verify(walletService, times(1)).update(any(Wallet.class));
         verify(accountUtil, times(1)).blockAccount();
+        verify(adminService, times(1)).getById(anyLong());
 
         assertEquals(dummyUser.getId(), walletResponse.getUserId());
         assertEquals(dummyUser.getWallet().getId(), walletResponse.getWalletId());
