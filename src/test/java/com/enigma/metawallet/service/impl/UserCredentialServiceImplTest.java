@@ -6,16 +6,18 @@ import com.enigma.metawallet.service.UserCredentialService;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
-@RequiredArgsConstructor
 class UserCredentialServiceImplTest {
     private final UserCredentialRepository userCredentialRepository = mock(UserCredentialRepository.class);
-    private final UserCredentialService userCredentialService = new UserCredentialServiceImpl(userCredentialRepository);
+
+    private final PasswordEncoder passwordEncoder = mock(PasswordEncoder.class);
+    private final UserCredentialService userCredentialService = new UserCredentialServiceImpl(userCredentialRepository, passwordEncoder);
     @Test
     void create() {
         UserCredential userCredential = new UserCredential();

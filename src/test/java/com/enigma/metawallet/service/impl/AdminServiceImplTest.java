@@ -14,7 +14,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
-import java.awt.print.Pageable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -25,9 +24,6 @@ import static org.mockito.Mockito.*;
 
 
 @SpringBootTest
-@RequiredArgsConstructor
-@NoArgsConstructor
-
 class AdminServiceImplTest {
     private final AdminRepository adminRepository = mock(AdminRepository.class);
     private final AdminService adminService = new AdminServiceImpl(adminRepository);
